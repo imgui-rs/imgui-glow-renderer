@@ -28,14 +28,14 @@ winit = { version = "0.29.3", features = ["rwh_05"] }
 # if you are certain you will only target platforms that lack the corresponding
 # feature.
 default = [
-  "gl_extensions_support",
-  "debug_message_insert_support",
-  "bind_vertex_array_support",
-  "vertex_offset_support",
-  "clip_origin_support",
-  "bind_sampler_support",
-  "polygon_mode_support",
-  "primitive_restart_support",
+    "gl_extensions_support",
+    "debug_message_insert_support",
+    "bind_vertex_array_support",
+    "vertex_offset_support",
+    "clip_origin_support",
+    "bind_sampler_support",
+    "polygon_mode_support",
+    "primitive_restart_support",
 ]
 # Enable checking for OpenGL extensions
 gl_extensions_support = []

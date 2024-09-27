@@ -86,13 +86,6 @@ impl GlVersion {
         self >= Self::gl(3, 2)
     }
 
-    /// Vertex arrays (e.g. `glBindVertexArray`) are supported from OpenGL 3.0
-    /// and OpenGL ES 3.0
-    #[cfg(feature = "vertex_array_support")]
-    pub fn vertex_array_support(self) -> bool {
-        self >= Self::gl(3, 0) || self >= Self::gles(3, 0)
-    }
-
     /// Separate binding of sampler (`glBindSampler`) is supported from OpenGL
     /// 3.2 or ES 3.0
     #[cfg(feature = "bind_sampler_support")]

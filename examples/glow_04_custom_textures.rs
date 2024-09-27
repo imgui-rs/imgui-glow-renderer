@@ -9,7 +9,6 @@ use std::{io::Cursor, num::NonZeroU32, time::Instant};
 
 use glow::HasContext;
 use glutin::surface::GlSurface;
-use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::Condition;
 
 use imgui_glow_renderer::Renderer;
@@ -18,7 +17,7 @@ use winit::event_loop::ControlFlow;
 #[allow(dead_code)]
 mod utils;
 
-const LENNA_JPEG: &[u8] = include_bytes!("../../resources/Lenna.jpg");
+const SIPI_PNG: &[u8] = include_bytes!("../sipi-4-2-07.png");
 
 fn main() {
     let (event_loop, window, surface, context) = utils::create_window("Custom textures", None);
@@ -110,14 +109,14 @@ fn main() {
 
 struct TexturesUi {
     generated_texture: imgui::TextureId,
-    lenna: Lenna,
+    lenna: SipiPng,
 }
 
 impl TexturesUi {
     fn new(gl: &glow::Context, textures: &mut imgui::Textures<glow::Texture>) -> Self {
         Self {
             generated_texture: Self::generate(gl, textures),
-            lenna: Lenna::load(gl, textures),
+            lenna: SipiPng::load(gl, textures),
         }
     }
 
@@ -263,23 +262,20 @@ impl TexturesUi {
     }
 }
 
-struct Lenna {
+struct SipiPng {
     texture_id: imgui::TextureId,
     size: [f32; 2],
 }
 
-impl Lenna {
+impl SipiPng {
     fn load(gl: &glow::Context, textures: &mut imgui::Textures<glow::Texture>) -> Self {
-        let decoder = JpegDecoder::new(Cursor::new(LENNA_JPEG)).expect("could not create decoder");
-        let (width, height) = decoder.dimensions();
-
-        let lenna_image = {
-            let mut bytes = vec![0; decoder.total_bytes() as usize];
-            decoder
-                .read_image(&mut bytes)
-                .expect("unable to decode jpeg");
-            bytes
-        };
+        let lenna_image = image::io::Reader::new(Cursor::new(SIPI_PNG))
+            .with_guessed_format()
+            .unwrap()
+            .decode()
+            .expect("could not make decoder")
+            .to_rgba8();
+        let (width, height) = lenna_image.dimensions();
 
         let gl_texture = unsafe { gl.create_texture() }.expect("unable to create GL texture");
 

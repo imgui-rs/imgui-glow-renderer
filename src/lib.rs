@@ -47,7 +47,10 @@
 
 use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of, num::NonZeroU32, rc::Rc};
 
-use imgui::{internal::RawWrapper, DrawCmd, DrawData, DrawVert};
+use imgui::{
+    internal::RawWrapper, BackendFlags, Context as ImGuiContext, DrawCmd, DrawCmdParams, DrawData,
+    DrawIdx, DrawVert, FontAtlas, TextureId, Textures,
+};
 
 use crate::versions::{GlVersion, GlslVersion};
 
@@ -82,7 +85,7 @@ impl AutoRenderer {
     /// result in an error.
     pub fn initialize(
         gl: glow::Context,
-        imgui_context: &mut imgui::Context,
+        imgui_context: &mut ImGuiContext,
     ) -> Result<Self, InitError> {
         let mut texture_map = SimpleTextureMap::default();
         let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map, true)?;
@@ -169,7 +172,7 @@ impl Renderer {
     /// result in an error.
     pub fn initialize<T: TextureMap>(
         gl: &Context,
-        imgui_context: &mut imgui::Context,
+        imgui_context: &mut ImGuiContext,
         texture_map: &mut T,
         output_srgb: bool,
     ) -> Result<Self, InitError> {
@@ -428,7 +431,7 @@ impl Renderer {
                 2,
                 glow::FLOAT,
                 false,
-                size_of::<imgui::DrawVert>() as _,
+                size_of::<DrawVert>() as _,
                 position_field_offset,
             );
             gl.enable_vertex_attrib_array(self.shaders.uv_attribute_index);
@@ -437,7 +440,7 @@ impl Renderer {
                 2,
                 glow::FLOAT,
                 false,
-                size_of::<imgui::DrawVert>() as _,
+                size_of::<DrawVert>() as _,
                 uv_field_offset,
             );
             gl.enable_vertex_attrib_array(self.shaders.color_attribute_index);
@@ -446,7 +449,7 @@ impl Renderer {
                 4,
                 glow::UNSIGNED_BYTE,
                 true,
-                size_of::<imgui::DrawVert>() as _,
+                size_of::<DrawVert>() as _,
                 color_field_offset,
             );
         }
@@ -460,7 +463,7 @@ impl Renderer {
         gl: &Context,
         texture_map: &T,
         element_count: usize,
-        element_params: imgui::DrawCmdParams,
+        element_params: DrawCmdParams,
         draw_data: &DrawData,
         fb_width: f32,
         fb_height: f32,
@@ -471,7 +474,7 @@ impl Renderer {
             clippy::cast_possible_wrap
         )]
 
-        let imgui::DrawCmdParams {
+        let DrawCmdParams {
             clip_rect,
             texture_id,
             vtx_offset,
@@ -508,7 +511,7 @@ impl Renderer {
                     glow::TRIANGLES,
                     element_count as _,
                     imgui_index_type_as_gl(),
-                    (idx_offset * size_of::<imgui::DrawIdx>()) as _,
+                    (idx_offset * size_of::<DrawIdx>()) as _,
                     vtx_offset as _,
                 );
             } else {
@@ -516,13 +519,13 @@ impl Renderer {
                     glow::TRIANGLES,
                     element_count as _,
                     imgui_index_type_as_gl(),
-                    (idx_offset * size_of::<imgui::DrawIdx>()) as _,
+                    (idx_offset * size_of::<DrawIdx>()) as _,
                 );
             }
         }
     }
 
-    fn configure_imgui_context(&self, imgui_context: &mut imgui::Context) {
+    fn configure_imgui_context(&self, imgui_context: &mut ImGuiContext) {
         imgui_context.set_renderer_name(Some(format!(
             "imgui-rs-glow-render {}",
             env!("CARGO_PKG_VERSION")
@@ -533,7 +536,7 @@ impl Renderer {
             imgui_context
                 .io_mut()
                 .backend_flags
-                .insert(imgui::BackendFlags::RENDERER_HAS_VTX_OFFSET);
+                .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
         }
     }
 
@@ -545,18 +548,18 @@ impl Renderer {
 /// Trait for mapping imgui texture IDs to OpenGL textures.
 ///
 /// [`register`] should be called after uploading a texture to OpenGL to get a
-/// [`imgui::TextureId`] corresponding to it.
+/// [`TextureId`] corresponding to it.
 ///
 /// [`register`]: Self::register
 ///
 /// Then [`gl_texture`] can be called to find the OpenGL texture corresponding to
-/// that [`imgui::TextureId`].
+/// that [`TextureId`].
 ///
 /// [`gl_texture`]: Self::gl_texture
 pub trait TextureMap {
-    fn register(&mut self, gl_texture: GlTexture) -> Option<imgui::TextureId>;
+    fn register(&mut self, gl_texture: GlTexture) -> Option<TextureId>;
 
-    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<GlTexture>;
+    fn gl_texture(&self, imgui_texture: TextureId) -> Option<GlTexture>;
 }
 
 /// Texture map where the imgui texture ID is simply numerically equal to the
@@ -566,12 +569,12 @@ pub struct SimpleTextureMap();
 
 impl TextureMap for SimpleTextureMap {
     #[inline(always)]
-    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
-        Some(imgui::TextureId::new(gl_texture.0.get() as _))
+    fn register(&mut self, gl_texture: glow::Texture) -> Option<TextureId> {
+        Some(TextureId::new(gl_texture.0.get() as _))
     }
 
     #[inline(always)]
-    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
+    fn gl_texture(&self, imgui_texture: TextureId) -> Option<glow::Texture> {
         #[allow(clippy::cast_possible_truncation)]
         Some(glow::NativeTexture(
             NonZeroU32::new(imgui_texture.id() as _).unwrap(),
@@ -579,13 +582,13 @@ impl TextureMap for SimpleTextureMap {
     }
 }
 
-/// [`imgui::Textures`] is a simple choice for a texture map.
-impl TextureMap for imgui::Textures<glow::Texture> {
-    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
+/// [`Textures`] is a simple choice for a texture map.
+impl TextureMap for Textures<glow::Texture> {
+    fn register(&mut self, gl_texture: glow::Texture) -> Option<TextureId> {
         Some(self.insert(gl_texture))
     }
 
-    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
+    fn gl_texture(&self, imgui_texture: TextureId) -> Option<glow::Texture> {
         self.get(imgui_texture).copied()
     }
 }
@@ -1067,7 +1070,7 @@ pub type RenderError = String;
 
 fn prepare_font_atlas<T: TextureMap>(
     gl: &Context,
-    fonts: &mut imgui::FontAtlas,
+    fonts: &mut FontAtlas,
     texture_map: &mut T,
 ) -> Result<GlTexture, InitError> {
     #![allow(clippy::cast_possible_wrap)]
@@ -1156,7 +1159,7 @@ unsafe fn to_byte_slice<T>(slice: &[T]) -> &[u8] {
 }
 
 const fn imgui_index_type_as_gl() -> u32 {
-    match size_of::<imgui::DrawIdx>() {
+    match size_of::<DrawIdx>() {
         1 => glow::UNSIGNED_BYTE,
         2 => glow::UNSIGNED_SHORT,
         _ => glow::UNSIGNED_INT,
