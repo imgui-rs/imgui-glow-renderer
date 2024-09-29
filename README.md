@@ -44,3 +44,12 @@ This library also assumes that textures have their internal format
 set appropriately when uploaded to OpenGL. That is, assuming your texture
 is sRGB (if you don't know, it probably is) the `internal_format` is
 one of the `SRGB*` values.
+
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or https://opensource.org/licenses/MIT)
+
+at your option.
