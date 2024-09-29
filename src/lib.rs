@@ -5,8 +5,8 @@
 use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of, num::NonZeroU32, rc::Rc};
 
 use imgui::{
-    internal::RawWrapper, BackendFlags, Context as ImGuiContext, DrawCmd, DrawCmdParams, DrawData,
-    DrawIdx, DrawVert, FontAtlas, TextureId, Textures,
+    internal::RawWrapper, Context as ImGuiContext, DrawCmd, DrawCmdParams, DrawData, DrawIdx,
+    DrawVert, FontAtlas, TextureId, Textures,
 };
 
 use crate::versions::{GlVersion, GlslVersion};
@@ -493,7 +493,7 @@ impl Renderer {
             imgui_context
                 .io_mut()
                 .backend_flags
-                .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
+                .insert(imgui::BackendFlags::RENDERER_HAS_VTX_OFFSET);
         }
     }
 
@@ -616,7 +616,8 @@ impl GlStateBackup {
         }
     }
 
-    fn pre_render(&mut self, gl: &Context, gl_version: GlVersion) {
+    // note: the CFG is because `gl_version` is unused in `no-default-features`
+    fn pre_render(&mut self, gl: &Context, #[allow(unused_variables)] gl_version: GlVersion) {
         #[allow(clippy::cast_sign_loss)]
         unsafe {
             self.active_texture = gl.get_parameter_i32(glow::ACTIVE_TEXTURE) as _;
@@ -1085,9 +1086,9 @@ fn gl_debug_message<G: glow::HasContext>(gl: &G, message: impl AsRef<str>) {
 #[cfg(any(target_vendor = "apple", not(feature = "debug_message_insert_support")))]
 fn gl_debug_message<G: glow::HasContext>(_gl: &G, _message: impl AsRef<str>) {}
 
+#[cfg_attr(not(feature = "clip_origin_support"), allow(unused_variables))]
+#[allow(clippy::deprecated_cfg_attr)]
 fn calculate_matrix(draw_data: &DrawData, clip_origin_is_lower_left: bool) -> [f32; 16] {
-    #![allow(clippy::deprecated_cfg_attr)]
-
     let left = draw_data.display_pos[0];
     let right = draw_data.display_pos[0] + draw_data.display_size[0];
     let top = draw_data.display_pos[1];
