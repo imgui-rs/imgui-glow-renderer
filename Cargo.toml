@@ -3,8 +3,8 @@ name = "imgui-glow-renderer"
 version = "0.12.0"
 edition = "2021"
 description = "glow renderer for the imgui crate"
-homepage = "https://github.com/imgui-rs/imgui-rs"
-repository = "https://github.com/imgui-rs/imgui-rs"
+homepage = "https://github.com/imgui-rs/imgui-glow-renderer"
+repository = "https://github.com/imgui-rs/imgui-glow-renderer"
 license = "MIT OR Apache-2.0"
 categories = ["gui", "rendering"]
 
