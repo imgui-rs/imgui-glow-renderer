@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glow-renderer"
-version = "0.12.0"
+version = "0.13.0"
 edition = "2021"
 description = "glow renderer for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-glow-renderer"
