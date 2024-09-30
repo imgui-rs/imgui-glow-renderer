@@ -33,7 +33,7 @@ fn main() {
     let gl = glow_context(&context);
 
     // OpenGL renderer from this crate
-    let mut ig_renderer = imgui_glow_renderer::AutoRenderer::initialize(gl, &mut imgui_context)
+    let mut ig_renderer = imgui_glow_renderer::AutoRenderer::new(gl, &mut imgui_context)
         .expect("failed to create renderer");
 
     let mut last_frame = Instant::now();

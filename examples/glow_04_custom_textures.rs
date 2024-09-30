@@ -31,7 +31,7 @@ fn main() {
     // Note that `output_srgb` is `false`. This is because we set
     // `glow::FRAMEBUFFER_SRGB` so we don't have to manually do the conversion
     // in the shader.
-    let mut ig_renderer = Renderer::initialize(&gl, &mut imgui_context, &mut textures, false)
+    let mut ig_renderer = Renderer::new(&gl, &mut imgui_context, &mut textures, false)
         .expect("failed to create renderer");
     let textures_ui = TexturesUi::new(&gl, &mut textures);
 

@@ -37,20 +37,28 @@ pub struct AutoRenderer {
 }
 
 impl AutoRenderer {
+    /// Creates a new [`AutoRenderer`] for simple rendering.
+    ///
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
     /// result in an error.
-    pub fn initialize(
-        gl: glow::Context,
-        imgui_context: &mut ImGuiContext,
-    ) -> Result<Self, InitError> {
+    pub fn new(gl: glow::Context, imgui_context: &mut ImGuiContext) -> Result<Self, InitError> {
         let mut texture_map = SimpleTextureMap::default();
-        let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map, true)?;
+        let renderer = Renderer::new(&gl, imgui_context, &mut texture_map, true)?;
         Ok(Self {
             gl: Rc::new(gl),
             texture_map,
             renderer,
         })
+    }
+
+    /// Creates a new [`AutoRenderer`] for simple rendering.
+    #[deprecated(since = "0.13.0", note = "use `new` instead")]
+    pub fn initialize(
+        gl: glow::Context,
+        imgui_context: &mut ImGuiContext,
+    ) -> Result<Self, InitError> {
+        Self::new(gl, imgui_context)
     }
 
     /// Note: no need to provide a `mut` version of this, as all methods on
@@ -127,7 +135,7 @@ impl Renderer {
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
     /// result in an error.
-    pub fn initialize<T: TextureMap>(
+    pub fn new<T: TextureMap>(
         gl: &Context,
         imgui_context: &mut ImGuiContext,
         texture_map: &mut T,
@@ -191,6 +199,17 @@ impl Renderer {
         out.configure_imgui_context(imgui_context);
 
         Ok(out)
+    }
+
+    /// Create the renderer, initialising OpenGL objects and shaders.
+    #[deprecated(since = "0.13.0", note = "use `new` instead")]
+    pub fn initialize<T: TextureMap>(
+        gl: &Context,
+        imgui_context: &mut ImGuiContext,
+        texture_map: &mut T,
+        output_srgb: bool,
+    ) -> Result<Self, InitError> {
+        Self::new(gl, imgui_context, texture_map, output_srgb)
     }
 
     /// This must be called before being dropped to properly free OpenGL

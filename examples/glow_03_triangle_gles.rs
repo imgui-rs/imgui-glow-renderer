@@ -29,7 +29,7 @@ fn main() {
     // Since we're drawing to screen and using OpenGL ES (which doesn't support
     // `GL_FRAMEBUFFER_SRGB`) then we do need to convert to sRGB in the shader.
     let mut ig_renderer =
-        imgui_glow_renderer::Renderer::initialize(&gl, &mut imgui_context, &mut texture_map, true)
+        imgui_glow_renderer::Renderer::new(&gl, &mut imgui_context, &mut texture_map, true)
             .expect("failed to create renderer");
     // Note the shader header now needs a precision specifier
     let tri_renderer = Triangler::new(&gl, "#version 300 es\nprecision mediump float;");
