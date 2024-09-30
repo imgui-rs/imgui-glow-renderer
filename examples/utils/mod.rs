@@ -8,11 +8,11 @@ use glutin::{
     surface::{GlSurface, Surface, SurfaceAttributesBuilder, SwapInterval, WindowSurface},
 };
 use imgui_winit_support::WinitPlatform;
-use raw_window_handle::HasRawWindowHandle;
+use raw_window_handle::HasWindowHandle;
 use winit::{
     dpi::LogicalSize,
     event_loop::EventLoop,
-    window::{Window, WindowBuilder},
+    window::{Window, WindowAttributes},
 };
 
 pub fn create_window(
@@ -26,11 +26,11 @@ pub fn create_window(
 ) {
     let event_loop = EventLoop::new().unwrap();
 
-    let window_builder = WindowBuilder::new()
+    let window_attributes = WindowAttributes::default()
         .with_title(title)
         .with_inner_size(LogicalSize::new(1024, 768));
     let (window, cfg) = glutin_winit::DisplayBuilder::new()
-        .with_window_builder(Some(window_builder))
+        .with_window_attributes(Some(window_attributes))
         .build(&event_loop, ConfigTemplateBuilder::new(), |mut configs| {
             configs.next().unwrap()
         })
@@ -42,7 +42,7 @@ pub fn create_window(
     if let Some(context_api) = context_api {
         context_attribs = context_attribs.with_context_api(context_api);
     }
-    let context_attribs = context_attribs.build(Some(window.raw_window_handle()));
+    let context_attribs = context_attribs.build(Some(window.window_handle().unwrap().as_raw()));
     let context = unsafe {
         cfg.display()
             .create_context(&cfg, &context_attribs)
@@ -52,7 +52,7 @@ pub fn create_window(
     let surface_attribs = SurfaceAttributesBuilder::<WindowSurface>::new()
         .with_srgb(Some(true))
         .build(
-            window.raw_window_handle(),
+            window.window_handle().unwrap().as_raw(),
             NonZeroU32::new(1024).unwrap(),
             NonZeroU32::new(768).unwrap(),
         );
@@ -83,7 +83,7 @@ pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
     let mut imgui_context = imgui::Context::create();
     imgui_context.set_ini_filename(None);
 
-    let mut winit_platform = WinitPlatform::init(&mut imgui_context);
+    let mut winit_platform = WinitPlatform::new(&mut imgui_context);
     winit_platform.attach_window(
         imgui_context.io_mut(),
         window,

@@ -56,6 +56,7 @@ fn main() {
     }));
 
     let mut last_frame = Instant::now();
+    #[allow(deprecated)]
     event_loop
         .run(move |event, window_target| {
             match event {

@@ -35,6 +35,7 @@ fn main() {
     let tri_renderer = Triangler::new(&gl, "#version 300 es\nprecision mediump float;");
 
     let mut last_frame = Instant::now();
+    #[allow(deprecated)]
     event_loop
         .run(move |event, window_target| {
             match event {

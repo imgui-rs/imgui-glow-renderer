@@ -36,6 +36,7 @@ fn main() {
     let textures_ui = TexturesUi::new(&gl, &mut textures);
 
     let mut last_frame = Instant::now();
+    #[allow(deprecated)]
     event_loop
         .run(move |event, window_target| {
             // Note we can potentially make the loop more efficient by
@@ -109,14 +110,14 @@ fn main() {
 
 struct TexturesUi {
     generated_texture: imgui::TextureId,
-    lenna: SipiPng,
+    sipi: SipiPng,
 }
 
 impl TexturesUi {
     fn new(gl: &glow::Context, textures: &mut imgui::Textures<glow::Texture>) -> Self {
         Self {
             generated_texture: Self::generate(gl, textures),
-            lenna: SipiPng::load(gl, textures),
+            sipi: SipiPng::load(gl, textures),
         }
     }
 
@@ -176,11 +177,11 @@ impl TexturesUi {
                 ui.text("Some generated texture");
                 imgui::Image::new(self.generated_texture, [100.0, 100.0]).build(ui);
 
-                ui.text("Say hello to Lenna.jpg");
-                self.lenna.show(ui);
+                ui.text("Say hello to Peppers");
+                self.sipi.show(ui);
 
                 // Example of using custom textures on a button
-                ui.text("The Lenna buttons");
+                ui.text("The Peppers buttons");
                 {
                     ui.invisible_button("Boring Button", [100.0, 100.0]);
                     // See also `imgui::Ui::style_color`
@@ -199,11 +200,7 @@ impl TexturesUi {
 
                     let draw_list = ui.get_window_draw_list();
                     draw_list
-                        .add_image(
-                            self.lenna.texture_id,
-                            ui.item_rect_min(),
-                            ui.item_rect_max(),
-                        )
+                        .add_image(self.sipi.texture_id, ui.item_rect_min(), ui.item_rect_max())
                         .col(tint)
                         .build();
                 }
@@ -232,7 +229,7 @@ impl TexturesUi {
 
                     let draw_list = ui.get_window_draw_list();
                     draw_list
-                        .add_image_quad(self.lenna.texture_id, tl, tr, br, bl)
+                        .add_image_quad(self.sipi.texture_id, tl, tr, br, bl)
                         .build();
                 }
 
@@ -244,7 +241,7 @@ impl TexturesUi {
                     let draw_list = ui.get_window_draw_list();
                     draw_list
                         .add_image_rounded(
-                            self.lenna.texture_id,
+                            self.sipi.texture_id,
                             ui.item_rect_min(),
                             ui.item_rect_max(),
                             16.0,
@@ -269,13 +266,13 @@ struct SipiPng {
 
 impl SipiPng {
     fn load(gl: &glow::Context, textures: &mut imgui::Textures<glow::Texture>) -> Self {
-        let lenna_image = image::io::Reader::new(Cursor::new(SIPI_PNG))
+        let sipi_png = image::io::Reader::new(Cursor::new(SIPI_PNG))
             .with_guessed_format()
             .unwrap()
             .decode()
             .expect("could not make decoder")
             .to_rgba8();
-        let (width, height) = lenna_image.dimensions();
+        let (width, height) = sipi_png.dimensions();
 
         let gl_texture = unsafe { gl.create_texture() }.expect("unable to create GL texture");
 
@@ -294,13 +291,13 @@ impl SipiPng {
             gl.tex_image_2d(
                 glow::TEXTURE_2D,
                 0,
-                glow::SRGB as _, // image file has sRGB encoded colors
+                glow::SRGB8_ALPHA8 as _, // image file has sRGB encoded colors
                 width as _,
                 height as _,
                 0,
-                glow::RGB,
+                glow::RGBA,
                 glow::UNSIGNED_BYTE,
-                Some(&lenna_image),
+                Some(&sipi_png),
             )
         }
 

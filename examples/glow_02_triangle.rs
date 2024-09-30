@@ -17,6 +17,7 @@ fn main() {
     let tri_renderer = Triangler::new(ig_renderer.gl_context(), "#version 330");
 
     let mut last_frame = Instant::now();
+    #[allow(deprecated)]
     event_loop
         .run(move |event, window_target| {
             match event {
