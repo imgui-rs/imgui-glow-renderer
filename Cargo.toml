@@ -9,14 +9,14 @@ license = "MIT OR Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-imgui = { version = "0.12.0" }
+imgui = { version = "0.12.0", git = "https://github.com/imgui-rs/imgui-rs" }
 glow = "0.14"
 memoffset = "0.9"
 
 [dev-dependencies]
 glutin = "0.32"
 glutin-winit = "0.5"
-imgui-winit-support = "0.13.0"
+imgui-winit-support = { version = "0.13.0", git = "https://github.com/imgui-rs/imgui-winit-support" }
 image = "0.23"
 raw-window-handle = "0.6.0"
 winit = { version = "0.30", features = ["rwh_06"] }
