@@ -10,14 +10,14 @@ categories = ["gui", "rendering"]
 
 [dependencies]
 imgui = { version = "0.12.0", git = "https://github.com/imgui-rs/imgui-rs" }
-glow = "0.16.0"
+glow = "0.18.0"
 memoffset = "0.9"
 
 [dev-dependencies]
 glutin = "0.32"
 glutin-winit = "0.5"
 imgui-winit-support = { version = "0.13.0", git = "https://github.com/imgui-rs/imgui-winit-support" }
-image = "0.25.5"
+image = "0.25.10"
 raw-window-handle = "0.6.0"
 winit = { version = "0.30", features = ["rwh_06"] }
 
