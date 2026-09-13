@@ -7,7 +7,7 @@
 
 use std::{io::Cursor, num::NonZeroU32, time::Instant};
 
-use glow::HasContext;
+use glow::{HasContext, PixelUnpackData};
 use glutin::surface::GlSurface;
 use imgui::Condition;
 
@@ -162,7 +162,7 @@ impl TexturesUi {
                 0,
                 glow::RGB,
                 glow::UNSIGNED_BYTE,
-                Some(&data),
+                PixelUnpackData::Slice(Some(&data)),
             )
         }
 
@@ -266,7 +266,7 @@ struct SipiPng {
 
 impl SipiPng {
     fn load(gl: &glow::Context, textures: &mut imgui::Textures<glow::Texture>) -> Self {
-        let sipi_png = image::io::Reader::new(Cursor::new(SIPI_PNG))
+        let sipi_png = image::ImageReader::new(Cursor::new(SIPI_PNG))
             .with_guessed_format()
             .unwrap()
             .decode()
@@ -297,7 +297,7 @@ impl SipiPng {
                 0,
                 glow::RGBA,
                 glow::UNSIGNED_BYTE,
-                Some(&sipi_png),
+                PixelUnpackData::Slice(Some(&sipi_png)),
             )
         }
 

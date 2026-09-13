@@ -13,7 +13,7 @@ use crate::versions::{GlVersion, GlslVersion};
 
 // Re-export glow to make it easier for users to use the correct version.
 pub use glow;
-use glow::{Context, HasContext};
+use glow::{Context, HasContext, PixelUnpackData};
 
 pub mod versions;
 
@@ -1077,7 +1077,7 @@ fn prepare_font_atlas<T: TextureMap>(
             0,
             glow::RGBA,
             glow::UNSIGNED_BYTE,
-            Some(atlas_texture.data),
+            PixelUnpackData::Slice(Some(atlas_texture.data)),
         );
     }
 

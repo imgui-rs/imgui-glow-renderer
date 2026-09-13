@@ -2,7 +2,7 @@
 //! using OpenGL ES, rather than full-fat OpenGL.
 //!
 //! Note this example uses `Renderer` rather than `AutoRenderer` and
-//! therefore requries more lifetime-management of the OpenGL context.
+//! therefore requires more lifetime-management of the OpenGL context.
 
 use std::{num::NonZeroU32, time::Instant};
 
